@@ -1,15 +1,16 @@
-
+import axios from 'axios';
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import Player from "./player";
 import "./styles.css";
 
-const weapons = ["rock", "paper", "scissors"];
+const moves = ["rock", "paper", "scissors"];
 class App extends Component {
   state = {
-    playerOne: weapons[0],
-    playerTwo: weapons[0],
-    winner: ""
+    player: moves[0],
+    bot: moves[0],
+    winner: "",
+    compl: ""
   };
 
   startGame = () => {
@@ -17,7 +18,7 @@ class App extends Component {
     let gameInterval = setInterval(() => {
       counter++;
       this.setState({
-        playerTwo: weapons[Math.floor(Math.random() * weapons.length)],
+        bot: moves[Math.floor(Math.random() * moves.length)],
         winner: ""
       });
       if (counter > 5) {
@@ -30,60 +31,95 @@ class App extends Component {
   };
 
   selectWinner = () => {
-    const { playerOne, playerTwo } = this.state;
-
-    if (playerOne === playerTwo) {
-      return "Tie!";
-    } else if (
-      (playerOne === "rock" && playerTwo === "scissors") ||
-      (playerOne === "scissors" && playerTwo === "paper") ||
-      (playerOne === "paper" && playerTwo === "rock")
-    ) {
-      return "You Win!";
+    let { player, bot } = this.state;
+    let skill = document.getElementById("skill")
+    if (player === "super rock") {
+        skill.value -= 3;
+        return "You Win!";
+    } else if (player === "ultra scissors") {
+        skill.value -= 3;
+        return "You Win!";
+    } else if (player === "angry paper") {
+        skill.value -= 3;
+        return "You Win!";
+    } else if (player === "rock" && bot === "scissors") {
+        skill.value += .5;
+        return "You Win!";
+    } else if (player === "scissors" && bot === "paper") {
+        skill.value += .5;
+        return "You Win!";
+    } else if (player === "paper" && bot === "rock") {
+        skill.value += .5;
+        return "You Win!";
+    } else if (player === bot) {
+        return "Tie!";
     } else {
-      return "You Lose!";
+        return "You Lose!";
     }
   };
-  selectWeapon = weapon => {
+  selectMove = move => {
+    let skill = document.getElementById("skill")
+    if (skill.value === 3) {
+        if (move === "rock") {
+            move = "super rock"
+        }
+        if (move === "paper") {
+            move = "angry paper"
+        }
+        if (move === "scissors") {
+            move = "ultra scissors"
+        }
+    }
     this.setState({
-      playerOne: weapon,
+      player: move,
       winner: ""
     });
   };
+  getCompliment = () => {
+    let haha = ""
+    axios.get(`https://complimentr.com/api`).then(
+        (response => {
+            haha = response.data.compliment
+            this.setState({compl: haha})
+        })
+    );
+  }
   render() {
-    const { playerOne, playerTwo, winner } = this.state;
+    const { player, bot, winner } = this.state;
     return (
       <>
-        <h1 style={{ textAlign: "center" }}>Rock Paper Scissors</h1>
-
-        <div>
-          <Player weapon={playerOne} />
-          <Player weapon={playerTwo} />
+        <h1 style={{ textAlign: "center" }}>Rock Paper Scissors Ultimate</h1>
+        <h4 style={{ textAlign: "center" }}>Please Select Move Before Each Turn</h4>
+        <div className="wrapper">
+            <div className="image">
+                <Player move={player} />
+                <Player move={bot} />
+            </div>
+            Power-Up
+            <progress id="skill" value="0" max="3"></progress>
+            <div className="buttons">
+                <button className="weaponBtn" onClick={() => this.selectMove("rock")}>
+                    rock
+                </button>
+                <button className="weaponBtn" onClick={() => this.selectMove("paper")}>
+                    paper
+                </button>
+                <button className="weaponBtn" onClick={() => this.selectMove("scissors")}>
+                    scissors
+                </button>
+            </div>
         </div>
-        <div>
-          <button
-            className="weaponBtn"
-            onClick={() => this.selectWeapon("rock")}
-          >
-            rock
-          </button>
-          <button
-            className="weaponBtn"
-            onClick={() => this.selectWeapon("paper")}
-          >
-            paper
-          </button>
-          <button
-            className="weaponBtn"
-            onClick={() => this.selectWeapon("scissors")}
-          >
-            scissor
-          </button>
-        </div>
+        
         <div className="winner">{winner ? this.selectWinner() : null}</div>
         <button type="button" onClick={this.startGame}>
-          Start!
+          Fight!
         </button>
+        <div style={{ textAlign: "center" }} className="compliment">
+            <button type="button" onClick={this.getCompliment}>
+                Compliment
+            </button>
+            {this.state.compl}
+        </div>
       </>
     );
   }

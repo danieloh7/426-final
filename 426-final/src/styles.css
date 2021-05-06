@@ -11,7 +11,9 @@ body {
   display: flex;
   justify-content: space-evenly;
 }
-
+#skill {
+  width: 100%;
+}
 .player {
   width: 240px;
   height: 180px;
@@ -64,4 +66,15 @@ button {
 
 button:hover {
   cursor: pointer;
+}
+
+@media only screen and (max-width: 800px) {
+  .wrapper {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+  }
+  .wrapper div:first-child {
+     order: 1;
+  }
 }

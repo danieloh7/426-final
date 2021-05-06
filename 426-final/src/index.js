@@ -1,68 +1,93 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
 
-class Square extends React.Component {
-    render() {
-      return (
-        <button className="square">
-          {/* TODO */}
-        </button>
-      );
+import React, { Component } from "react";
+import ReactDOM from "react-dom";
+import Player from "./player";
+import "./styles.css";
+
+const weapons = ["rock", "paper", "scissors"];
+class App extends Component {
+  state = {
+    playerOne: weapons[0],
+    playerTwo: weapons[0],
+    winner: ""
+  };
+
+  startGame = () => {
+    let counter = 0;
+    let gameInterval = setInterval(() => {
+      counter++;
+      this.setState({
+        playerTwo: weapons[Math.floor(Math.random() * weapons.length)],
+        winner: ""
+      });
+      if (counter > 5) {
+        clearInterval(gameInterval);
+        this.setState({
+          winner: this.selectWinner()
+        });
+      }
+    }, 100);
+  };
+
+  selectWinner = () => {
+    const { playerOne, playerTwo } = this.state;
+
+    if (playerOne === playerTwo) {
+      return "Tie!";
+    } else if (
+      (playerOne === "rock" && playerTwo === "scissors") ||
+      (playerOne === "scissors" && playerTwo === "paper") ||
+      (playerOne === "paper" && playerTwo === "rock")
+    ) {
+      return "You Win!";
+    } else {
+      return "You Lose!";
     }
-  }
-  
-  class Board extends React.Component {
-    renderSquare(i) {
-      return <Square />;
-    }
-  
-    render() {
-      const status = 'Next player: X';
-  
-      return (
+  };
+  selectWeapon = weapon => {
+    this.setState({
+      playerOne: weapon,
+      winner: ""
+    });
+  };
+  render() {
+    const { playerOne, playerTwo, winner } = this.state;
+    return (
+      <>
+        <h1 style={{ textAlign: "center" }}>Rock Paper Scissors</h1>
+
         <div>
-          <div className="status">{status}</div>
-          <div className="board-row">
-            {this.renderSquare(0)}
-            {this.renderSquare(1)}
-            {this.renderSquare(2)}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(3)}
-            {this.renderSquare(4)}
-            {this.renderSquare(5)}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(6)}
-            {this.renderSquare(7)}
-            {this.renderSquare(8)}
-          </div>
+          <Player weapon={playerOne} />
+          <Player weapon={playerTwo} />
         </div>
-      );
-    }
-  }
-  
-  class Game extends React.Component {
-    render() {
-      return (
-        <div className="game">
-          <div className="game-board">
-            <Board />
-          </div>
-          <div className="game-info">
-            <div>{/* status */}</div>
-            <ol>{/* TODO */}</ol>
-          </div>
+        <div>
+          <button
+            className="weaponBtn"
+            onClick={() => this.selectWeapon("rock")}
+          >
+            rock
+          </button>
+          <button
+            className="weaponBtn"
+            onClick={() => this.selectWeapon("paper")}
+          >
+            paper
+          </button>
+          <button
+            className="weaponBtn"
+            onClick={() => this.selectWeapon("scissors")}
+          >
+            scissor
+          </button>
         </div>
-      );
-    }
+        <div className="winner">{winner ? this.selectWinner() : null}</div>
+        <button type="button" onClick={this.startGame}>
+          Start!
+        </button>
+      </>
+    );
   }
-  
-  // ========================================
-  
-  ReactDOM.render(
-    <Game />,
-    document.getElementById('root')
-  );
-  
+}
+
+const rootElement = document.getElementById("root");
+ReactDOM.render(<App />, rootElement);

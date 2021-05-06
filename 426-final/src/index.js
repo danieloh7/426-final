@@ -10,7 +10,8 @@ class App extends Component {
     player: moves[0],
     bot: moves[0],
     winner: "",
-    compl: ""
+    compl: "",
+    activity: ""
   };
 
   startGame = () => {
@@ -84,6 +85,15 @@ class App extends Component {
         })
     );
   }
+  getActivity = () => {
+    let bore = ""
+    axios.get(`https://www.boredapi.com/api/activity`).then(
+        (response => {
+            bore = response.data.activity
+            this.setState({activity: bore})
+        })
+    );
+  }
   render() {
     const { player, bot, winner } = this.state;
     return (
@@ -114,11 +124,15 @@ class App extends Component {
         <button type="button" onClick={this.startGame}>
           Fight!
         </button>
-        <div style={{ textAlign: "center" }} className="compliment">
+        <div style={{ textAlign: "center" }} className="api">
             <button type="button" onClick={this.getCompliment}>
                 Compliment
             </button>
             {this.state.compl}
+            <button type="button" onClick={this.getActivity}>
+                Do Something Else
+            </button>
+            {this.state.activity}
         </div>
       </>
     );
